@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="styles.css">
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 </head>
 
@@ -76,6 +77,40 @@ Explained in seconds.
 
 <div class="inputArea">
 
+<div id="dropZone" class="dropZone">
+
+<input type="file" id="fileInput" accept=".txt,.pdf" hidden>
+
+<div class="dropZoneContent">
+
+<div class="dropZoneIcon">📁</div>
+
+<p class="dropZoneText">
+
+<strong>Click to upload</strong> or drag & drop
+
+</p>
+
+<p class="dropZoneHint">.txt or .pdf files</p>
+
+</div>
+
+<div id="fileInfo" class="fileInfo" style="display:none;">
+
+<span id="fileName"></span>
+
+<button id="removeFile" type="button">✕</button>
+
+</div>
+
+</div>
+
+<div class="divider">
+
+<span>or paste text</span>
+
+</div>
+
 <textarea
 
 id="userInput"
@@ -134,7 +169,7 @@ Download
 
 <div class="loader"></div>
 
-Thinking...
+<span id="loadingText">Thinking...</span>
 
 </div>
 
