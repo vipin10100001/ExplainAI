@@ -2,10 +2,12 @@
 
 Upload anything. Understand everything.
 
-ExplainAI takes complex text — legal documents, medical reports, research papers, government notices — and explains it in simple terms using Google's Gemini AI.
+ExplainAI takes complex documents — legal papers, medical reports, research papers, government notices — and explains them in simple terms using Google's Gemini AI.
 
 ## Features
 
+- 📁 **Upload files** — drag & drop or click to upload `.txt` and `.pdf` files
+- 📋 **Paste text** — or just paste text directly, no file needed
 - 📄 **Legal** — Contracts, rental agreements, court notices
 - 🏥 **Medical** — Blood reports, prescriptions, lab reports
 - 📚 **Research** — Academic papers, articles, thesis
@@ -18,6 +20,7 @@ ExplainAI takes complex text — legal documents, medical reports, research pape
 
 - **Frontend:** HTML, CSS, vanilla JavaScript
 - **Markdown rendering:** [marked.js](https://github.com/markedjs/marked)
+- **PDF text extraction:** [pdf.js](https://mozilla.github.io/pdf.js/) (client-side, via CDN)
 - **Backend:** Vercel Serverless Functions (Node.js)
 - **AI:** Google Gemini API
 
@@ -25,9 +28,9 @@ ExplainAI takes complex text — legal documents, medical reports, research pape
 
 ```
 explainai/
-├── index.html          # Main page
+├── index.html          # Main page (paste box + file upload zone)
 ├── styles.css          # Styling
-├── script.js           # Frontend logic (calls /api/explain)
+├── script.js           # Frontend logic — file reading, PDF extraction, calls /api/explain
 ├── package.json
 └── api/
     └── explain.js       # Serverless function — calls Gemini API securely
@@ -35,11 +38,26 @@ explainai/
 
 ## How It Works
 
-The frontend never talks to Gemini directly. Instead, it sends the pasted text to a Vercel serverless function (`/api/explain`), which securely calls the Gemini API using a server-side API key. This keeps the API key hidden from the browser at all times.
+1. The user either uploads a `.txt`/`.pdf` file or pastes text directly.
+2. For `.txt` files, the browser reads the content directly.
+3. For `.pdf` files, `pdf.js` extracts the text from each page — entirely in the browser, no file is uploaded to any server.
+4. The extracted/pasted text is sent to `/api/explain`, a Vercel serverless function.
+5. The serverless function calls the Gemini API using a server-side API key and returns the explanation.
 
 ```
-Browser  →  /api/explain (Vercel Function)  →  Gemini API
+Browser (file/text) → /api/explain (Vercel Function) → Gemini API → Explanation
 ```
+
+The Gemini API key never reaches the browser — it lives only in Vercel's environment variables and is used exclusively inside the serverless function.
+
+## Supported File Types
+
+| Type | Support |
+|------|---------|
+| `.txt` | ✅ Full support |
+| `.pdf` (text-based) | ✅ Full support (text extracted via pdf.js) |
+| `.pdf` (scanned/image-only) | ⚠️ Not supported yet — no readable text to extract (would need OCR) |
+| `.docx`, images, etc. | 🚧 Not supported yet |
 
 ## Setup & Deployment
 
@@ -91,7 +109,14 @@ vercel dev
 
 - Model used: `gemini-2.5-flash` (configurable in `api/explain.js`)
 - If you see a "high demand" error, it's a temporary issue on Google's end — retry after a few minutes.
+- Uploading a file and typing in the textarea are mutually exclusive — whichever you interact with last takes priority.
 - Never commit your `.env` file or hardcode API keys in frontend code.
+
+## Roadmap
+
+- [ ] OCR support for scanned/image-based PDFs
+- [ ] `.docx` file support
+- [ ] Direct image upload (e.g. photographed documents) using Gemini's vision capabilities
 
 ## License
 
